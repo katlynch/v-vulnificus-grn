@@ -1,0 +1,37 @@
+# V.Vulnificus HupA/VvhA Model System of Equations 
+# ODE file for xpp bifurcation analysis
+# params of interest:
+# extFe = availability of external iron
+# extHe = availability of external heme
+# equations
+# regulatory proteins
+da/dt=a1*(pa-a)
+df/dt=(1-f)-b1*f*fe
+dr/dt=a4*(1-p0-pa)-b3*hi^2*r+b2*rs-a3*r
+drs/dt=b3*hi^2*r-b2*rs
+# heme iron pathways
+dhi/dt=extHe*a-p2*hi/(1+hi)-2*b4*r*hi^2+2*b5*rs-a4*hi
+dfe/dt=p3*hi/(1+hi)-b6*f*fe+b7*(1-f)-a5*fe+1/(kx*(1-f)+1)*(p4*extFe/(1+extFe)-p5*fe/(1+fe))
+# operon probabilities
+dpa/dt=k1*(1-p0-pa)*rs-km1*pa+eps*(1-p0-pa)
+dp0/dt=k2*(1-p0-pa)*(1-f)-km2*p0
+# parameters 
+param k1=.1,b3=1
+param extHe=1,extFe=0
+# param k1=1,b3=1
+param a1=1,a2=1,a3=1,a4=1,a5=1
+param b1=10,b2=1,b4=1,b5=1,b6=1,b7=1
+param p1=1,p2=1,p3=1,p4=1,p5=1
+param k2=1,kx=1,km1=1,km2=1
+param eps=1/100
+# initialization
+init a=0, f=1, r=0, rs=0
+init hi=0, fe=0
+init pa=0.1, p0=0.2
+# set up
+@ xplot=hi,yplot=fe
+@ total=100,dt=.2
+@ xlo=-0.1,xhi=2,ylo=-0.1,yhi=2
+@ autoxmin=-0.01,autoxmax=1,autoymin=-0.01,autoymax=2
+@ dsmax=0.05,parmin=0,parmax=10.1
+done

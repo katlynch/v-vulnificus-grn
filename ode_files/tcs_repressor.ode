@@ -1,0 +1,29 @@
+# Two Component GRN with repressor
+# ODE file for xpp bifurcation analysis
+# pared down model of v.vulnificus HupA/HupR/Fur
+# params of interest: k1, a1
+# equations
+da/dt=a1*pa-d1*a+2*k1m*rs-2*k1*r*a^2-k2*(1-fs)*a+k2m*fs
+dr/dt=a2*(1-pa)-d2*r+k1m*rs-k1*r*a^2
+drs/dt=k1*r*a^2-k1m*rs
+dfs/dt=k2*(1-fs)*a-k2m*fs
+dpa/dt=b1*(1-pa-p0)*rs-b2*pa+eps*pa
+dp0/dt=b3*(1-pa-p0)*fs-b4*p0
+# parameters 
+param k1=5,a1=2
+param k1m=1,k2=1,k2m=1,b1=1,b2=1,b3=1,b4=1
+param a2=1,d1=1,d2=1,eps=1/100
+# initialization
+# both in region 2 which has bistability
+# this one ends at 'off' steady state
+# init a=0, r=0, rs=0, fs=0, pa=0, p0=0
+# this one ends at 'on' steady state
+init a=1, r=0, rs=0, fs=0, pa=1, p0=0
+# set up
+@ meth=cvode
+@ xplot=a,yplot=rs
+@ total=100,dt=.05
+@ xlo=-0.1,xhi=10,ylo=-0.1,yhi=10
+@ autoxmin=-1,autoxmax=30,autoymin=-1,autoymax=3
+@ ds=0.1,dsmin=0.01,dsmax=1,parmin=0,parmax=30
+done

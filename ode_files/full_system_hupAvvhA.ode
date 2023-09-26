@@ -1,0 +1,50 @@
+# V.Vulnificus HupA/VvhA Model System of Equations 
+# ODE file for xpp bifurcation analysis
+# params of interest:
+# extFe = availability of external iron
+# extHe = availability of external heme
+# k6 ish temperature
+# equations
+# regulatory proteins
+da/dt=a1*(pa-a)
+dd/dt=a2*(pd-d)
+df/dt=(1-f)-b1*f*fe
+dc/dt=a3*pc+b3*is-b2*c*fe-n1*c
+dis/dt=b2*fe*c-b3*is-n2*is
+dr/dt=a4*pr-b4*hi*r+b5*rs-n3*r
+drs/dt=b4*hi*r-b5*rs-n4*rs
+# heme iron pathways
+dvi/dt=a5*(pv+pvi)-n5*vi-p1*vi/(1+vi)*d
+dve/dt=p1*vi/(1+vi)*d-n6*ve
+dhe/dt=extHe*ve-p2*he/(1+he)*a-n7*he
+dhi/dt=p2*he/(1+he)*a-n8*hi-p3*hi/(1+hi)-b5*r*hi+b6*rs
+dfe/dt=p4*hi/(1+hi)-b7*f*fe-b3*fe*c+b8*is+(1-f)-n9*fe+1/(k8*(1-f)+1)*(p5*extFe/(1+extFe)-p6*fe/(1+fe))
+# operon probabilities
+dpa/dt=km1*pr*rs-k1*pa+eps*pr
+dpr/dt=k1*pa-km1*pr*rs+km2*(1-pa-pr)-k2*pr*(1-f)-eps*pr
+dpd/dt=km3*(1-pd)*fe-k3*pd+eps*(1-pd)
+dpc/dt=km4*(1-pc)-k4*pc*is
+dpv/dt=k5*pvi-km5*pv*c+km6*(1-pv-pvi-pvf)-k6*pv+k7*pvf-km7*pv*(1-f)
+dpvi/dt=km5*pv*c-k5*pvi
+dpvf/dt=km7*pv*(1-f)-k7*pvf
+# parameters 
+param extHe=1,extFe=0
+param k6=1,k2=10
+param a1=1,a2=1,a3=1,a4=1,a5=1
+param b1=10,b2=1,b3=1,b4=10,b5=1,b6=1,b7=10,b8=10
+param p1=1,p2=1,p3=1,p4=1,p5=1,p6=1
+param n1=1,n2=1,n3=1,n4=1,n5=1, n6=1,n7=1,n8=1,n9=1
+param k1=1,k3=1,k4=1,k5=1,k7=10,k8=1
+param km1=1,km2=1,km3=1,km4=1,km5=1,km6=1,km7=1
+param eps=1/100
+# initialization
+init a=0, d=0, f=1, c=0, is=0, r=0, rs=0
+init vi=0, ve=0, he=0, hi=0, fe=0
+init pa=0, pr=1, pd=0, pc=1, pv=1, pvi=0, Pvf=0
+# set up
+@ xplot=f,yplot=fe
+@ total=100,dt=.2
+@ xlo=-0.1,xhi=2,ylo=-0.1,yhi=2
+@ autoxmin=-0.01,autoxmax=15,autoymin=-0.01,autoymax=0.1
+@ dsmax=0.05,parmin=0,parmax=14.5
+done
