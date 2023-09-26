@@ -1,0 +1,258 @@
+%% v vulnificus model
+
+% solves the system of ODEs and plots a selection of solutions
+% nondimensional
+% vibrio vulnificus
+
+% updated nondimensionalization
+
+
+%% RUN OPTIONS
+
+
+%% MODEL SET UP
+% Parameters
+
+
+% Variable Parameter Values
+
+% affects the following model parameters
+% (1) b7 = availability external iron
+% (2) b6 =  vvha conversion of RBC to heme, i.e. availability of heme
+% (3) k6m = rate of conversion Pvn -> Pv i.e. availability of HNS due to temp
+
+if opt == 0
+    var_Fe = @(t) extFe; var_RBC = @(t) RBC; var_temp = @(t) temp;
+elseif opt == 1
+    var_Fe = @(t) Fe_init.*(t<tf_1) + Fe_mid.* (t>=tf_1 & t<tf_2) + Fe_final.* (t>=tf_2);   % (1)
+    var_RBC = @(t) He_init.*(t<th_1)+ He_mid.* (t>=th_1 & t<th_2) + He_final.* (t>=th_2);   % (2) 
+    var_temp = @(t) temp;
+elseif opt == 2
+    var_Fe = @(t) (Fe_final-Fe_init)/2*tanh(a*(t-tf_1)) + (abs(Fe_init - Fe_final)/2 + min(Fe_final,Fe_init));  % (1)
+    var_RBC = @(t) (He_final-He_init)/2*tanh(a*(t-th_1)) + (abs(He_init - He_final)/2 + min(He_final,He_init)); % (2)
+    var_temp = @(t) temp;
+elseif opt == 3
+    var_Fe  = @(t) b7; var_RBC = @(t) b6;
+    var_temp = @(t) 1/a*abs((t - tfinal/2)) +1;
+end
+
+
+
+
+%% MODEL ANALYSIS
+
+% solve system of ODEs
+tic
+Opt = odeset('Events',@event);
+[t,v] = ode45(@(t,v)vvsys(t,v,a,b,n,p,k,km,var_Fe,var_RBC,var_temp),t0:0.01:tfinal,v0,Opt);
+% ode15s(@(t,v)vvsys(t,v,b,g,n,p,k,km,var_Fe,var_RBC,var_Hn),t0:0.01:tfinal,v0,Opt);
+toc
+
+tic
+%% Plot Solutions
+% v = [1a 2d 3f 4i 5is 6r 7rs 8vi 9ve 10he 11hi 12fe 13Pa 14Pr 15Pd 16Pi 17Pv 18Pvi 19Pvf]
+% 
+
+% debug plotting
+tplot=t0:0.1:tfinal;
+figure()
+plot(tpl,)
+
+
+% % set figure to larger size
+% figh = figure();
+% pos = get(figh,'position');
+% set(figh,'position',[pos(1:2)/4 pos(3:4)*2])
+% 
+% 
+% % Figure
+% tplot=t0:0.1:tfinal;
+% 
+% 
+% subplot(3,3,1)
+% % variable Fe, He values
+% if opt == 3
+%     hold on
+%     plot0 = plot(tplot,var_k2(tplot),'linewidth',2);
+% 
+%     plot1 = plot(tplot,var_Fe(tplot),'.','color',"#0072BD");
+%     plot2 = plot(tplot,var_RBC(tplot),'.','color',	"#D95319");
+%     legend([plot0(1),plot1(1),plot2(1)],{'k2','Fe','RBC'})
+%     hold off
+% else
+% hold on
+% plot1 = plot(tplot,var_Fe(tplot),'o','color',"#0072BD");
+% plot2 = plot(tplot,var_RBC(tplot),'.','color',	"#D95319");
+% legend([plot1(1),plot2(1)],{'Fe','RBC'})
+% hold off
+% end
+% 
+% 
+% 
+% 
+% subplot(3,3,2)
+% % hupA/hupR operon
+% hold on 
+% plot(t,v(:,13),'linewidth',2)    % Pa
+% plot(t,v(:,14),'linewidth',2)   % Pr
+% plot(t, 1-v(:,13) - v(:,14),'linewidth',2)   % P0
+% hold off
+% % ylim([-0.05,0.05])
+% legend('Pa','Pr','P0')
+% 
+% subplot(3,3,3)
+% % vvhA operon
+% hold on
+% plot(t,v(:,17),'linewidth',2)                       % Pv unbound
+% plot(t,v(:,18),'linewidth',2)                       % Pv bound Iscr
+% plot(t,v(:,19),'linewidth',2)                       % Pv bound F*
+% plot(t,1-v(:,17)-v(:,18)-v(:,19),'linewidth',2)     % Pv bound N
+% hold off
+% legend('Pv','Pvi','Pvf','Pvn')
+% 
+% 
+% 
+% subplot(3,3,4)
+% % heme intake
+% hold on
+% plot(t,v(:,13),'linewidth',2)   % Pa
+% plot(t,v(:,1),'linewidth',2)    % HupA
+% plot(t,v(:,11),'linewidth',2)   % internal heme
+% plot(t,v(:,12),'color','k','linewidth',2)   % internal iron
+% legend('Pa','A','Hi','Fe')
+% hold off
+% 
+% 
+% % heme/iron extraction
+% subplot(3,3,5)
+% hold on 
+% plot(t,v(:,8),'linewidth',2)                % VvhA internal
+% plot(t,v(:,9),'linewidth',2)                % VvhA external
+% plot(t,v(:,10),'linewidth',2)               % heme external
+% plot(t,v(:,11),'linewidth',2)               % heme internal
+% plot(t,v(:,12),'color','k','linewidth',2)   % iron
+% hold off
+% legend('Vi','Ve','He','Hi','Fe')
+% 
+% % VvhA creation and export
+% subplot(3,3,6)
+% hold on
+% plot(t,v(:,17)+v(:,18),'linewidth',2)   % unrepressed vvha operon
+% plot(t,v(:,8),'linewidth',2)            % VvhA internal
+% plot(t,v(:,15),'linewidth',2)           % unrepressed pild operon
+% plot(t,v(:,2),'linewidth',2)            % PilD
+% plot(t,v(:,9),'linewidth',2)            % VvhA external
+% hold off
+% legend('Pv','Vi','Pd','D','Ve')
+% 
+% 
+% 
+% 
+% 
+% % Row 3: Miscellaneous / Sanity Checks
+% 
+% % extracellular environment
+% subplot(3,3,7)
+% hold on
+% plot(t,v(:,9),'linewidth',2)    % vvha external
+% plot(t,v(:,10),'linewidth',2)   % heme external
+% hold off
+% legend('Ve','He')
+% 
+% 
+% subplot(3,3,8)
+% % regulatory proteins/TFs
+% hold on 
+% plot(t,v(:,3),'linewidth',2)    % Fur
+% plot(t,1-v(:,3),'linewidth',2)  % F*
+% plot(t,v(:,4),'linewidth',2)    % IscR
+% plot(t,v(:,5),'linewidth',2)    % I*
+% plot(t,v(:,6),'linewidth',2)    % R
+% plot(t,v(:,7),'linewidth',2)    % R*
+% hold off
+% %ylim([-0.1,0.1])
+% legend('F','F*','I','I*','R','R*')
+% 
+% 
+% subplot(3,3,9)
+% % debug check (plots all vars)
+% hold on
+% plot1=plot(t,v(:,1:12),'color',"#0072BD",'linewidth',1);
+% plot2=plot(t,v(:,13:19),'color',"#D95319",'linewidth',1);
+% hold off
+% ylim([-0.1,1.1])
+% legend([plot1(1),plot2(1)],{'conc.','prob.'})
+% 
+% sgtitle(title)
+
+
+%% Final Admin
+
+
+% save plot as png
+if sv == 1
+    saveas(gcf, title, 'png')
+end
+
+toc 
+
+%% Define Functions
+function [value, isterminal, direction] = event(t,v)
+% debugging check
+    % v = [1a 2d 3f 4i 5is 6r 7rs 8vi 9ve 10he 11hi 12fe 13Pa 14Pr 15Pd 16Pi 17Pv 18Pvi 19Pvf]
+    value = v(13);    % Want to know if value crosses 0
+    isterminal = 1;             % halt integration when = 1
+    direction = 0;              % zero can be approached from either direction (if = 0)
+    
+end
+
+
+function dvdt = vvsys(t,v,a,b,n,p,k,km,varFe,varRBC,var_temp)
+% nondimensional system of odes
+
+% variable parameters
+a(7) = varFe(t);
+a(6) = varRBC(t);
+k(6) = var_temp(t);
+% k(2) = var_k2(t);
+
+
+% proteins
+% v = [1a 2d 3f 4i 5is 6r 7rs 8vi 9ve 10he 11hi 12fe 13Pa 14Pr 15Pd 16Pi 17Pv 18Pvi 19Pvf]
+da = a(1)*(v(13) - v(1));
+dd = a(2)*(v(15) - v(2));
+df = (1-v(3)) - b(1)*v(3)*v(12);
+di = a(3)*v(16) + b(3)*v(5) - b(2)*v(4)*v(12) - n(1)*v(4);
+dis = b(2)*v(12)*v(4) - b(3)*v(5) - n(2)*v(5);
+dr = a(4)*v(14)+ b(5)*v(7) - b(4)*v(6)*v(11) - n(3)*v(6);
+drs = b(4)*v(11)*v(6) - b(5)*v(7) - n(4)*v(7) ;
+
+% v = [1a 2d 3f 4i 5is 6r 7rs 8vi 9ve 10he 11hi 12fe 13Pa 14Pr 15Pd 16Pi 17Pv 18Pvi 19Pvf]
+% iron acquisition
+dvi = a(5)*(v(17)+v(18))-n(5)*v(8) - p(1)*b(2)*v(8)/(1+v(8))*v(2);
+dve = p(1)*b(2)*v(8)/(1+v(8))*v(2) - n(6)*v(9);
+dhe = a(6)*v(9) - p(2)*v(10)/(1+v(10))*v(1) - n(7)*v(10);
+dhi = p(2)*v(10)/(1+v(10))*v(1) - n(8)*v(11) - p(3)*v(11)/(1+v(11)) - b(5)*v(6)*v(11) + b(6)*v(7);
+
+dfe = p(4)*v(11)/(1+v(11)) - b(7)*v(3)*v(12) - b(3)*v(12)*v(4) + b(8)*v(5) + (1-v(3))  ...
+      - n(9)*v(12) + (p(5)*a(7)/(1+a(7))-p(6)*v(12)/(1+v(12)))/(k(8)*(1-v(3))+1);
+
+% operon probabilities
+% v = [1a 2d 3f 4i 5is 6r 7rs 8vi 9ve 10he 11hi 12fe 13Pa 14Pr 15Pd 16Pi 17Pv 18Pvi 19Pvf]
+dpa = km(1)*v(14)*v(7) - k(1)*v(13) + (1/1000)*v(14)
+dpr = k(1)*v(13) - km(1)*v(14)*v(7) + km(2)*(1-v(13)-v(14)) - k(2)*v(14)*(1-v(3)) - (1/1000)*v(14)
+
+dpd = km(3)*(1-v(15))*v(12) - k(3)*v(15) + (1/100)*(1-v(15));
+
+dpi = km(4)*(1-v(16)) - k(4)*v(16)*v(5);
+dpv = k(5)*v(18) - km(5)*v(17)*v(4) + km(6)*(1-v(17)-v(18)-v(19)) - k(6)*v(17) + k(7)*v(19) - km(7)*v(17)*(1-v(3));
+dpvi = km(5)*v(17)*v(4) - k(5)*v(18);
+dpvf = km(7)*v(17)*(1-v(3)) - k(7)*v(19);
+
+
+% output vector / system of DEs
+dvdt = [da dd df di dis dr drs dvi dve dhe dhi dfe dpa dpr dpd dpi dpv dpvi dpvf]';
+
+end
+
+
