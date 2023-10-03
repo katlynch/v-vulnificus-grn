@@ -15,7 +15,7 @@ b1=1;   % F --> F*
 b6=1;   % Fe --> F*
 b7=1;   % F* --> Fe
 b2=1;   % R* --> R
-b3=1;   % R --> R*
+placeholdb3=1;   % R --> R*  % make variable; this
 b4=1;   % Hi --> R*
 b5=1;   % R* --> Hi
 
@@ -44,7 +44,7 @@ eps = 1/100;
 
 % put in vectors to pass to ODE solver
 a=[a1 a2 n1 n2 n3];
-b=[b1 b2 b3 b4 b5 b6 b7];
+b=[b1 b2 placeholdb3 b4 b5 b6 b7];
 p=[p1 p2 p3 p4 p5];
 k=[k1 k2 k3 k1m k2m eps];
 

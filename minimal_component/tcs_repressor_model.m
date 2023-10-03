@@ -163,7 +163,7 @@ toc
 
 function [value, isterminal, direction] = event(t,v)
 % debugging check
-    value = v(4);   % Want to know if value crosses 0
+    value = v(4);               % Want to know if this value crosses 0
     isterminal = 1;             % halt integration when = 1
     direction = 0;              % zero can be approached from either direction (if = 0)
     
@@ -171,21 +171,25 @@ end
 
 
 function dvdt = tcs_sys(t,v,params,var_k1,var_a1)
+% sets up system of nondim ODEs for simplified model with repression
+% system somewhat stiff; use appropriate method (i.e. ode15s)
 
+    % variable params
     k1 = var_k1(t);
     a1= var_a1(t);
 
     % params=[1 a1  2 a2  3 d1  4 d2  5 b1  6 b2  7 b3  8 b4  9 k1m  10 k2m eps];
 
     % equations
-    dadt = a1*v(5) - params(3)*v(1) + 2*params(9)*v(3) - 2*k1*v(2)*v(1)^2 - params(11)*(1-v(4))*v(1) + params(10)*v(4);
-    drdt = params(2)*(1-v(5)-v(6))-params(4)*v(2)+params(9)*v(3)-k1*v(2)*v(1)^2;
-    drsdt = -params(9)*v(3)+k1*v(2)*v(1)^2;
-    dfsdt = params(11)*(1-v(4))*v(1) - params(10)*v(4);
-    dpadt = params(5)*(1-v(5)-v(6))*v(3) - params(6)*v(5)+params(12)*(1-v(5));
-    dp0dt = params(7)*(1-v(5)-v(6))*v(4) - params(8)*v(6);
+    dadt = a1*v(5) - params(3)*v(1) + 2*params(9)*v(3) - 2*k1*v(2)*v(1)^2 ...
+        - params(11)*(1-v(4))*v(1) + params(10)*v(4);                               % hupA
+    drdt = params(2)*(1-v(5)-v(6))-params(4)*v(2)+params(9)*v(3)-k1*v(2)*v(1)^2;    % hupR
+    drsdt = -params(9)*v(3)+k1*v(2)*v(1)^2;                                         % activated hupR / TF
+    dfsdt = params(11)*(1-v(4))*v(1) - params(10)*v(4);                             % activated fur
+    dpadt = params(5)*(1-v(5)-v(6))*v(3) - params(6)*v(5)+params(12)*(1-v(5));      % P(operon in hupA state)
+    dp0dt = params(7)*(1-v(5)-v(6))*v(4) - params(8)*v(6);                          % P(operon repressed)
 
-    
+    % collect eqns into system vector
     dvdt = [dadt drdt drsdt dfsdt dpadt dp0dt]';
 end
 

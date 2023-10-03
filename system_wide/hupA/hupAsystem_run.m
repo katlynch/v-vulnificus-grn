@@ -50,6 +50,7 @@ input(2).rbc = 1;
 input(3).fe=1;
 input(3).rbc= 1;
 
+input(1).b3 = 1;
 
 % set initial conditions
 
@@ -68,19 +69,20 @@ ics(1).pr = 1;
 
 
 % load non-variable parameters / constants
-full_params
+hupA_params
 
 %% Runs 
-for m1=1:1                              % iterate over ics
-    v0 = [ics(m1).a ics(m1).f ics(m1).r ics(m1).rs ics(m1).hi ics(m1).fe ics(m1).pa ics(m1).pr];
+for i=1:1                              % iterate over ics
+    v0 = [ics(i).a ics(i).f ics(i).r ics(i).rs ics(i).hi ics(i).fe ics(i).pa ics(i).pr];
 
     if opt == 0
         
-        for m2 = 1:3        % iterate over params    
-            extFe = input(m2).fe;
-            RBC = input(m2).rbc;
+        for j = 1:3        % iterate over params    
+            extFe = input(j).fe;
+            RBC = input(j).rbc;
+            b3 = input(j).b2;
     
-            title = sprintf("r%02d FullSys ics%02d fe%02d rbc%02d",run_no,m1,extFe,floor(RBC)); % plot title / save title
+            title = sprintf("r%02d FullSys ics%02d fe%02d rbc%02d",run_no,i,extFe,floor(RBC)); % plot title / save title
     
             vvsystem            % solves ode system and plots
     
@@ -94,7 +96,7 @@ for m1=1:1                              % iterate over ics
     
          title = sprintf("r%02d FullSys opt1",run_no); % plot title / save title
     
-         vvsystem 
+         vv_hupA_system 
     end
 end
 

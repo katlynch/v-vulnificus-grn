@@ -88,6 +88,7 @@ for i = 1:7     % iterate through initial conditions
     tcs_model
 end
 end
+
 elseif opt == 1
     for j = 1:6
         k1constant =k1_tcsr(j);
