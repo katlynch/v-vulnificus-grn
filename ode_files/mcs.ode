@@ -1,0 +1,20 @@
+# Two Component GRN 
+# ODE file for xpp bifurcation analysis
+# pared down model of v.vulnificus HupA/HupR
+# params of interest: k1,a1
+# equations
+dx/dt=k1*x^2*(1-x)-k2*x+eps*(1-x)
+# parameters 
+param k1=10, eps=0.1
+param k2=1
+@ meth=cvode
+# initialization
+# init a=0, r=0, rs=0, pa=0
+init x=0.1
+# set up
+@ xplot=t,yplot=x
+@ total=100,dt=.2
+@ xlo=-.1,xhi=5,ylo=-.1,yhi=5
+@ autoxmin=0,autoxmax=20,autoymin=-.1,autoymax=2
+@ ds=0.1,dsmax=0.1,dsmin=0.02,parmin=0,parmax=5
+done
