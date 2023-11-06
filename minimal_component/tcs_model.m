@@ -8,13 +8,13 @@
 %% RUN OPTIONS
 
 % plot and file title
- title = 'k1tests';
+title = 'ode solver test';
 
 % set sv=1 to save png of outputted plots
 sv=0;
 
 % simulation overall time interval
-t0=0; tfinal=500;
+t0=0; tfinal= 200;
 
 % determines value of some variable parameter in simulation
 % in this model, use k1 = rate of R* formation / phosphorylation
@@ -22,13 +22,15 @@ opt_k=0;
 opt_a=0;
 
 % opt = 0 constant value for k1
-    k1constant=2;
+    k1constant=10;
     a1constant=2;
 
-% opt = 1 sudden change(s)
-    k1_init=12; k1_final=7;
+% opt =/= 0 variable params 
+    k1_init=10; k1_final=1;
     a1_init=1; a1_final=1;
-    
+
+% opt = 1 sudden changes
+
 % opt = 2 smooth changes
     % init->final changes happen according to hyperbolic tangent
     % w/midpoint at time halfway between initial and final
@@ -36,15 +38,16 @@ opt_a=0;
 
     % initial / final k1
     t_half=(t0+tfinal)/2;   % midpoint of time interval
-    stp=0.02;               % determines steepness of tanh
+    stp=0.005;               % determines steepness of tanh
 
 % opt = 3 smooth changes (up then down)
     t_mid1=t_half/2;
     t_mid2=t_half+t_mid1;
 
 % initial conditions
+% v0 = [a r rs pa]
 % v0 = [0 0 0 1];
-v0 = [1 0 0 1];
+ v0 = [0 1 0 0];
 
 
 
@@ -158,7 +161,7 @@ end
 function dvdt = tcs_sys(t,v,params,k1,a1)
 
     k1 = k1(t);
-    a1=a1(t);
+    a1 = a1(t);
 
     % equations
     dadt = a1*v(4) - params(3)*v(1) + 2*params(7)*v(3) - 2*k1*v(2)*v(1)^2;
