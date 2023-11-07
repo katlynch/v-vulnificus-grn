@@ -8,9 +8,9 @@ dr/dt=a2*(1-pa)-d2*r+k1m*rs-k1*r*a^2
 drs/dt=k1*r*a^2-k1m*rs
 dpa/dt=b1*(1-pa)*rs-b2*pa+eps*(1-pa)
 # parameters 
-param k1=3,a1=2
+param k1=0.1,eps=0.02,a2=6
 param k1m=1,b1=1,b2=1
-param a2=1,d1=1,d2=1,eps=.001
+param a1=2,d1=1,d2=1
 @ meth=cvode
 # initialization
 # init a=0, r=0, rs=0, pa=0
@@ -18,7 +18,7 @@ init a=1, r=0, rs=0, pa=1
 # set up
 @ xplot=a,yplot=r
 @ total=100,dt=.2
-@ xlo=-.1,xhi=5,ylo=-.1,yhi=5
-@ autoxmin=0,autoxmax=5,autoymin=-.1,autoymax=2
+@ xlo=-.1,xhi=2,ylo=-.1,yhi=5
+@ autoxmin=0,autoxmax=2,autoymin=-.1,autoymax=2
 @ ds=0.01,dsmax=0.1,dsmin=0.01,parmin=0,parmax=5
 done
